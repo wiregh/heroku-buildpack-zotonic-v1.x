@@ -1,0 +1,144 @@
+#!/bin/bash
+
+##
+# usage: bin/compile <build-dir> <cache-dir> <env-dir>
+
+set -e
+bpdir=$(cd $(dirname $(dirname $0)); pwd)
+mkdir -p "$1" "$2"
+build=$(cd "$1/" && pwd)
+test -z ${build} && exit
+cache=$(cd "$2/" && pwd)
+
+test -z ${cache} && exit
+ENV_DIR=$3
+REBAR3_URL="https://s3-eu-west-1.amazonaws.com/zotonic-rebar/rebar3"
+
+export_env_dir() {
+  env_dir=$1
+  whitelist_regex=${2:-'(OTP_VERSION|ZOTONIC_VERSION)'}
+  blacklist_regex=${3:-'^(PATH|GIT_DIR|CPATH|CPPATH|LD_PRELOAD|LIBRARY_PATH)$'}
+  if [ -d "$env_dir" ]; then
+    for e in $(ls $env_dir); do
+      echo "$e" | grep -E "$whitelist_regex" | grep -qvE "$blacklist_regex" &&
+      export "$e=$(cat $env_dir/$e)"
+      :
+    done
+  fi
+}
+
+export_env_dir $ENV_DIR
+
+DEFAULT_OTP_VERSION="runtimes/OTP-19.0_cedar-14"
+otp_ver=${OTP_VERSION:=${DEFAULT_OTP_VERSION}}
+
+tarball=$(echo ${otp_ver} | grep -o '[^/]*$').tgz
+OTP_TARBALL_URL="https://s3.amazonaws.com/heroku-buildpack-erlang/runtimes/${otp_ver}_cedar-14.tgz"
+ERLROOT=${build}/otp
+Z_ROOT=${build}/zotonic
+PROFILE=${HOME}/.profile.d
+DEFAULT_ZOTONIC_VERSION="master"
+z_ver=${ZOTONIC_VERSION:=${DEFAULT_ZOTONIC_VERSION}}
+
+z_tarball="zotonic-${z_ver}.tgz"
+ZOTONIC_TARBALL_URL="https://codeload.github.com/zotonic/zotonic/tar.gz/${z_ver}"
+
+echo "-----> Using Erlang/OTP $otp_ver"
+echo "-----> Using Zotonic ${z_ver}"
+(
+    set -e
+
+    # Already cached?
+    test -f ${cache}/${tarball} && exit
+
+   # rm -rf ${cache}/* # be sure not to build up cruft
+    cd ${cache}
+    echo "-------> Fetching Erlang/OTP $otp_ver"
+    curl -s ${OTP_TARBALL_URL} > $tarball || exit 1
+
+)
+(
+    set -e
+
+    # Already cached?
+    test -f ${cache}/${z_tarball} && exit
+
+    #rm -rf ${cache}/* # be sure not to build up cruft
+    cd ${cache}
+    echo "-------> Fetching Zotonic ${z_ver}"
+    (curl -s ${ZOTONIC_TARBALL_URL} > $z_tarball) || exit 1
+)
+
+# Moving file around
+mkdir -p /tmp/site
+mv ${build}/* /tmp/site
+
+
+echo "-------> Unpacking Erlang/OTP $otp_ver"
+mkdir -p ${ERLROOT}
+tar zxf ${cache}/${tarball} -C ${ERLROOT}
+echo "-------> Installing Erlang/OTP $otp_ver"
+ln -s ${ERLROOT} /app/otp
+
+${ERLROOT}/Install -minimal /app/otp
+
+echo "-------> Unpacking Zotonic ${z_ver}"
+mkdir -p ${Z_ROOT}
+tar zxf ${cache}/${z_tarball} -C ${Z_ROOT} --strip-components=1
+
+
+echo "-------> Installing site"
+mkdir -p ${Z_ROOT}/user/sites
+rm -Rf ${Z_ROOT}/user/sites/*
+mv /tmp/site ${Z_ROOT}/user/sites
+
+
+PATH=/app/otp/bin:$PATH
+export PATH
+
+
+cd ${Z_ROOT}
+
+echo "-------> Copying over rebar.config.script for extra dependencies"
+rm rebar.config.script
+cp ${bpdir}/opt/rebar.config.script ./
+
+
+
+ if [ ! -e "rebar3" ]; then
+                echo "-----> Installing Rebar3"
+                curl -s ${REBAR3_URL} > rebar3
+                chmod +x rebar3
+ fi
+
+unset GIT_DIR
+
+    echo "Enabling caching of _build"
+
+    z_bcd=${cache}/zotonic/_build
+    z_bcdz=$z_bcd/default/lib/zotonic
+    z_bcdz_include=$z_bcdz/include
+    z_bcdz_priv=$z_bcdz/priv
+    z_bcdz_src=$z_bcdz/src
+
+    mkdir -p $z_bcdz
+    find -L $z_bcdz/ -maxdepth 1 -type l -delete
+    rm -rf $z_bcdz/.rebar3
+
+    ln -s ${Z_ROOT}/include $z_bcdz_include
+    ln -s ${Z_ROOT}/priv $z_bcdz_priv
+    ln -s ${Z_ROOT}/src $z_bcdz_src
+
+    ln -s $z_bcd ${Z_ROOT}/_build
+
+
+echo "-----> Building release with Rebar3"
+./rebar3 compile 2>&1 | sed -u 's/^/       /'
+bin/zotonic compile 2>&1 | sed -u 's/^/       /'
+echo "-----> Installing start script and configurator"
+cd ../
+cp ${bpdir}/opt/start ./
+chmod +x start
+cp ${bpdir}/opt/zotonic_site_config ./
+
+echo "-----> Build succeeded"

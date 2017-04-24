@@ -1,0 +1,8 @@
+os:putenv("EXOMETER_PACKAGES", "-afunix -netlink -exo +setup"),
+case file:consult("user/sites/site/compile_deps") of
+    {ok,[ExtraDeps]}->
+        Deps = proplists:get_value(deps, CONFIG, []),
+        lists:keystore(deps, 1, CONFIG, {deps, Deps ++ ExtraDeps});
+    _ ->
+    CONFIG
+end.
