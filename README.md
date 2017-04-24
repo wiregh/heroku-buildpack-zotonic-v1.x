@@ -88,9 +88,9 @@ You may need to write a new commit and push if your code was already up to date.
 
 ### TODO
 
-Fetches deps and rebuilds all Zotonic on each deploys, should use the build cache to only recompile the necessary bits.
+~~Fetches deps and rebuilds all Zotonic on each deploys, should use the build cache to only recompile the necessary bits.~~
 
-IMPORTANT: All file uploads go to the transient file system, meaning that everything is destroyed on each deploys. These assets should go to S3 or similar.
+~~IMPORTANT: All file uploads go to the transient file system, meaning that everything is destroyed on each deploys. These assets should go to S3 or similar.~~
 
 Pull requests are very welcome.
 
