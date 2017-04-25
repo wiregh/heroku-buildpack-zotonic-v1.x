@@ -1,6 +1,6 @@
 #!/bin/bash
 
-##
+#
 # usage: bin/compile <build-dir> <cache-dir> <env-dir>
 
 set -e
@@ -29,7 +29,7 @@ export_env_dir() {
 
 export_env_dir $ENV_DIR
 
-DEFAULT_OTP_VERSION="runtimes/OTP-19.0_cedar-14"
+DEFAULT_OTP_VERSION="OTP-19.1.1"
 otp_ver=${OTP_VERSION:=${DEFAULT_OTP_VERSION}}
 
 tarball=$(echo ${otp_ver} | grep -o '[^/]*$').tgz
