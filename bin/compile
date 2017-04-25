@@ -135,6 +135,12 @@ unset GIT_DIR
 echo "-----> Building release with Rebar3"
 ./rebar3 compile 2>&1 | sed -u 's/^/       /'
 bin/zotonic compile 2>&1 | sed -u 's/^/       /'
+
+rm _build
+mkdir -p _build/default/lib
+rsync -avzh $z_bcd/default/lib/*/ebin _build/default/lib/
+
+
 echo "-----> Installing start script and configurator"
 cd ../
 cp ${bpdir}/opt/start ./
