@@ -115,7 +115,7 @@ unset GIT_DIR
 
     echo "Enabling caching of _build"
 
-    z_bcd=${cache}/zotonic/_build
+    export z_bcd=${cache}/zotonic/_build
     z_bcdz=$z_bcd/default/lib/zotonic
     z_bcdz_include=$z_bcdz/include
     z_bcdz_priv=$z_bcdz/priv
