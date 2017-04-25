@@ -137,8 +137,8 @@ echo "-----> Building release with Rebar3"
 bin/zotonic compile 2>&1 | sed -u 's/^/       /'
 
 rm _build
-mkdir -p _build/default/lib
-rsync -avzh $z_bcd/default/lib/*/ebin _build/default/lib/
+#mkdir -p _build/default/lib
+rsync -avzh $z_bcd ./
 
 
 echo "-----> Installing start script and configurator"
