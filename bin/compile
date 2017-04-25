@@ -149,5 +149,3 @@ chmod +x start
 cp ${bpdir}/opt/zotonic_site_config ./
 
 echo "-----> Build succeeded"
-
-echo "-----> Build succeeded"
