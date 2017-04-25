@@ -130,16 +130,17 @@ unset GIT_DIR
     ln -s ${Z_ROOT}/src $z_bcdz_src
 
     ln -s $z_bcd ${Z_ROOT}/_build
-    echo "$cache"
-ls -al /
-echo "   "
 
-echo "   "
-ls -al /app
 
 mkdir -p ${cache}/rebar3
 mkdir -p /app/.cache
+rm -rf /app/.cache/rebar3
 ln -s ${cache}/rebar3 /app/.cache/rebar3
+ls -al ${cache}/rebar3
+echo "   "
+
+echo "   "
+ls -al /app/.cache/rebar3/hex/default/packages
 
 echo "-----> Building release with Rebar3"
 ./rebar3 compile 2>&1 | sed -u 's/^/       /'
