@@ -136,6 +136,11 @@ echo "   "
 
 echo "   "
 ls -al /app
+
+mkdir -p ${cache}/rebar3
+mkdir -p /app/.cache
+ln -s ${cache}/rebar3 /app/.cache/rebar3
+
 echo "-----> Building release with Rebar3"
 ./rebar3 compile 2>&1 | sed -u 's/^/       /'
 bin/zotonic compile 2>&1 | sed -u 's/^/       /'
