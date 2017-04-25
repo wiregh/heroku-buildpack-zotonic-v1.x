@@ -131,21 +131,16 @@ unset GIT_DIR
 
     ln -s $z_bcd ${Z_ROOT}/_build
 
-
-mkdir -p ${cache}/rebar3
-mkdir -p /app/.cache
-rm -rf /app/.cache/rebar3
-ln -s ${cache}/rebar3 /app/.cache/rebar3
-
-
-
+    mkdir -p ${cache}/rebar3
+    mkdir -p /app/.cache
+    rm -rf /app/.cache/rebar3
+    ln -s ${cache}/rebar3 /app/.cache/rebar3
 
 echo "-----> Building release with Rebar3"
 ./rebar3 compile 2>&1 | sed -u 's/^/       /'
 bin/zotonic compile 2>&1 | sed -u 's/^/       /'
 rm _build
 rsync -zar --include="*/" --include="*.beam" --include="*.app" --include="*.so" --include="*.app"--exclude="*" $z_bcd ./
-
 
 echo "-----> Installing start script and configurator"
 cd ../
