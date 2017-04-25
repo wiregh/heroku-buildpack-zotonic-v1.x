@@ -138,7 +138,7 @@ bin/zotonic compile 2>&1 | sed -u 's/^/       /'
 
 rm _build
 #mkdir -p _build/default/lib
-rsync -zar --include="*/" --include="*.beam" --exclude="*" $z_bcd ./
+rsync -zar --include="*/" --include="*.beam" --include="*.app"--exclude="*" $z_bcd ./
 
 echo "-----> Installing start script and configurator"
 cd ../
