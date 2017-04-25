@@ -146,7 +146,7 @@ bin/zotonic compile 2>&1 | sed -u 's/^/       /'
 rm _build
 rsync -zar --include="*/" --include="*.beam" --include="*.app" --include="*.so" --include="*.app"--exclude="*" $z_bcd ./
 
-ls -al /app/.cache/rebar3/hex/default/packages
+ls -al /app/.cache/rebar3/hex
 
 echo "-----> Installing start script and configurator"
 cd ../
