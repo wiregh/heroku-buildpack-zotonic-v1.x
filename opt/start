@@ -9,4 +9,7 @@ echo "Configuring database connection and admin password from environment"
 ./zotonic_site_config ${z_site_config} ${z_site_config}
 echo "Starting Zotonic on port $PORT"
 cd zotonic
+echo "CONTENTS OF _build DIR"
+ls _build/default/lib
+
 erl -emu_args -init_debug -env ERL_MAX_PORTS 256 -env ZOTONIC_PORT $PORT +P 10000000 +K true -pa $EBIN -boot start_sasl -config ${erlang_config} -config ${z_default_config}  -noshell -s zotonic
