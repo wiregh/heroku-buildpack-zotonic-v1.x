@@ -136,8 +136,8 @@ echo "-----> Building release with Rebar3"
 ./rebar3 compile 2>&1 | sed -u 's/^/       /'
 bin/zotonic compile 2>&1 | sed -u 's/^/       /'
 rm _build
-rsync -zar $z_bcd ./
-#rsync -zar --include="*/" --include="*.beam" --include="*.app"--exclude="*" $z_bcd ./
+#rsync -zar $z_bcd ./
+rsync -zar --include="*/" --include="*.beam" --include="*.app" --include="*.so" --include="*.app"--exclude="*" $z_bcd ./
 
 
 echo "-----> Installing start script and configurator"
