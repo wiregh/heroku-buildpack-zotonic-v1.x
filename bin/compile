@@ -113,28 +113,32 @@ cp ${bpdir}/opt/rebar.config.script ./
 
 unset GIT_DIR
 
-    #echo "Enabling caching of _build"
+    echo "Enabling caching of _build"
 
-    #z_bcd=${cache}/zotonic/_build
-    #z_bcdz=$z_bcd/default/lib/zotonic
-    #z_bcdz_include=$z_bcdz/include
-    #z_bcdz_priv=$z_bcdz/priv
-    #z_bcdz_src=$z_bcdz/src
+    export z_bcd=${cache}/zotonic/_build
+    z_bcdz=$z_bcd/default/lib/zotonic
+    z_bcdz_include=$z_bcdz/include
+    z_bcdz_priv=$z_bcdz/priv
+    z_bcdz_src=$z_bcdz/src
 
-    #mkdir -p $z_bcdz
-    #find -L $z_bcdz/ -maxdepth 1 -type l -delete
-    #rm -rf $z_bcdz/.rebar3
+    mkdir -p $z_bcdz
+    find -L $z_bcdz/ -maxdepth 1 -type l -delete
+    rm -rf $z_bcdz/.rebar3
 
-    #ln -s ${Z_ROOT}/include $z_bcdz_include
-    #ln -s ${Z_ROOT}/priv $z_bcdz_priv
-    #ln -s ${Z_ROOT}/src $z_bcdz_src
+    ln -s ${Z_ROOT}/include $z_bcdz_include
+    ln -s ${Z_ROOT}/priv $z_bcdz_priv
+    ln -s ${Z_ROOT}/src $z_bcdz_src
 
-    #ln -s $z_bcd ${Z_ROOT}/_build
+    ln -s $z_bcd ${Z_ROOT}/_build
 
 
 echo "-----> Building release with Rebar3"
 ./rebar3 compile 2>&1 | sed -u 's/^/       /'
 bin/zotonic compile 2>&1 | sed -u 's/^/       /'
+rm _build
+rsync -zar --include="*/" --include="*.beam" --include="*.app" --include="*.so" --include="*.app"--exclude="*" $z_bcd ./
+
+
 echo "-----> Installing start script and configurator"
 cd ../
 cp ${bpdir}/opt/start ./
