@@ -130,7 +130,10 @@ unset GIT_DIR
     ln -s ${Z_ROOT}/src $z_bcdz_src
 
     ln -s $z_bcd ${Z_ROOT}/_build
+ls -al /
+echo "   "
 
+echo "   "
 ls -al /app
 echo "-----> Building release with Rebar3"
 ./rebar3 compile 2>&1 | sed -u 's/^/       /'
