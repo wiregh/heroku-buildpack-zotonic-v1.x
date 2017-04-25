@@ -130,6 +130,7 @@ unset GIT_DIR
     ln -s ${Z_ROOT}/src $z_bcdz_src
 
     ln -s $z_bcd ${Z_ROOT}/_build
+    echo "$cache"
 ls -al /
 echo "   "
 
